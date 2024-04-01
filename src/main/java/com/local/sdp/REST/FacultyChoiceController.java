@@ -69,6 +69,19 @@ public class FacultyChoiceController {
     }
 
 
+    @DeleteMapping("/{groupId}/{facultyId}")
+    void removeChoice(@PathVariable int groupId, @PathVariable int facultyId){
+        FacultyChoice facultyChoice = facultyChoiceInterface.getFacultyChoiceById(groupId, facultyId);
+        facultyChoiceInterface.remove(facultyChoice);
+        List<FacultyChoice> allProjectChoices = facultyChoiceInterface.getAllFacultyChoiceByGroup(groupId);
+        for (FacultyChoice choice : allProjectChoices) {
+            if (choice.getPriority() > facultyChoice.getPriority()) {
+                choice.setPriority(choice.getPriority() - 1);
+                facultyChoiceInterface.save(choice);
+            }
+        }
+    }
+
     @GetMapping("/assignFaculty")
     ResponseEntity<String> assignFaculty(){
         List<Group> groups = groupServiceInterface.groupList();
